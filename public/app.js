@@ -2,20 +2,24 @@
 // Whenever someone clicks a p tag
 $(document).on("click", "p", function() {
   // Empty the notes from the note section
-  $("#notes").empty();
-  // Save the id from the p tag
   var currentArticle = $(this).attr("data-id");
+  renderNotes(currentArticle);
+});
+
+function renderNotes(currentArticle){
+  $("#notes").empty();
 
   // Now make an ajax call for the Article
   $.ajax({
     method: "GET",
-    url: "/articles/" + thisId
+    url: "/articles/" + currentArticle
   })
     // With that done, add the note information to the page
     .then(function(data) {
       console.log(data);
 
-      var notes = data.notes;
+      var notes = data.note;
+      console.log(notes);
 
       if(notes.length>0) {
 
@@ -47,8 +51,7 @@ $(document).on("click", "p", function() {
       // If there's a note in the article
      
     });
-});
-
+}
 // When you click the savenote button
 $(document).on("click", "#savenote", function() {
   // Grab the id associated with the article from the submit button
@@ -69,7 +72,32 @@ $(document).on("click", "#savenote", function() {
       // Log the response
       console.log(data);
       // Empty the notes section
-      $("#notes").empty();
+      renderNotes(thisId);
+    });
+
+  // Also, remove the values entered in the input and textarea for note entry
+ 
+  $("#bodyinput").val("");
+});
+
+$(document).on("click", "#delete-note", function() {
+  // Grab the id associated with the article from the submit button
+  var currentNote = $(this).attr("data-id");
+  var currentArticle = $(this).attr("article-id");
+
+  // Run a POST request to change the note, using what's entered in the inputs
+  $.ajax({
+    method: "DELETE",
+    url: "/delete/" + currentNote,
+    
+  })
+    // With that done
+    .then(function(data) {
+      // Log the response
+      console.log("note deleted");
+      // Empty the notes section
+      // $("#notes").empty();
+      renderNotes(currentArticle);
     });
 
   // Also, remove the values entered in the input and textarea for note entry
